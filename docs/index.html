@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Time Capsule Test</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        text-align: center;
+        padding: 50px;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: #fff;
+        overflow-x: hidden;
+    }
+    h1 { font-size: 3em; margin-bottom: 10px; }
+    #username {
+        font-size: 4em;
+        font-weight: bold;
+        color: #00ffff;
+        text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+        margin-bottom: 20px;
+    }
+    #countdown { font-size: 2em; margin: 20px 0; color: #ffd700; animation: shimmer 2s infinite; }
+    @keyframes shimmer {
+        0% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;}
+        50% { text-shadow: 0 0 20px #ffec00, 0 0 30px #ffec00;}
+        100% { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;}
+    }
+    #passwordInput, button { padding: 10px 20px; font-size: 16px; margin: 5px; border-radius: 5px; border: none; }
+    button { background-color: #ffd700; color: #000; cursor: pointer; transition: transform 0.2s; }
+    button:hover { transform: scale(1.1); }
+    #message { color: #ff6347; font-weight: bold; }
+    #content { display: none; margin-top: 30px; animation: fadeIn 2s ease-in-out; }
+    #content img, #content video { margin: 10px; max-width: 500px; border: 3px solid #ffd700; border-radius: 10px; }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    #lock { font-size: 5em; margin: 20px; color: #ffd700; transition: transform 1s, color 1s; }
+    #lock.unlocked { transform: rotateY(180deg) scale(1.2); color: #00ff00; }
+</style>
+</head>
+<body>
+
+<div id="username">John Albert 9A</div>
+
+<h1>🔒 Time Capsule Test</h1>
+<p>Unlock your secret content in 1 minute!</p>
+
+<div id="countdown">Loading countdown...</div>
+<div id="lock">🔐</div>
+
+<input type="password" id="passwordInput" placeholder="Enter password" disabled>
+<button onclick="checkPassword()" disabled>Unlock</button>
+<p id="message"></p>
+
+<div id="content">
+    <h2>🎉 Secret Content Unlocked! 🎉</h2>
+    <p>Here are your precious photos:</p>
+    <img src="photo1.jpg" alt="Photo 1">
+    <img src="photo2.jpg" alt="Photo 2">
+
+    <h3>Watch this video:</h3>
+    <video width="500" controls>
+        <source src="video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <p>More memories to explore…</p>
+</div>
+
+<script>
+const passwordField = document.getElementById('passwordInput');
+const unlockButton = document.querySelector('button');
+const countdownEl = document.getElementById('countdown');
+const lockEl = document.getElementById('lock');
+const content = document.getElementById('content');
+const message = document.getElementById('message');
+
+// Set unlock time for 1 minute from now
+const unlockDate = new Date().getTime() + 60 * 1000;
+
+// Check if unlocked previously
+if(localStorage.getItem('timeCapsuleUnlocked') === 'true') {
+    showContent();
+} else {
+    const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = unlockDate - now;
+
+        if (distance > 0) {
+            const minutes = Math.floor(distance / (1000*60));
+            const seconds = Math.floor((distance % (1000*60)) / 1000);
+            countdownEl.textContent = `Time until unlock: ${minutes}m ${seconds}s`;
+        } else {
+            clearInterval(timer);
+            countdownEl.textContent = "The Time Capsule is now unlocked!";
+            passwordField.disabled = false;
+            unlockButton.disabled = false;
+        }
+    }, 1000);
+}
+
+function checkPassword() {
+    const password = "future2023"; // Password for test
+    const input = passwordField.value;
+
+    if (input === password) {
+        localStorage.setItem('timeCapsuleUnlocked', 'true'); // Save unlock state
+        showContent();
+    } else {
+        message.textContent = "Incorrect password!";
+    }
+}
+
+function showContent() {
+    content.style.display = "block";
+    passwordField.disabled = true;
+    unlockButton.disabled = true;
+    countdownEl.textContent = "The Time Capsule is unlocked!";
+    lockEl.classList.add('unlocked');
+}
+</script>
+</body>
+</html>
